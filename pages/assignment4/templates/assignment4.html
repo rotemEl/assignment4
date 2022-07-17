@@ -35,6 +35,11 @@ d. List of users  -->
     </form>
 
     <form action="/assignment4" method="list" name="list">
+        <!-- use jinja2 to display a list of all users -->
+        <ul>
+            {% for user in users %}
+                <li>username: {{ user.username }}  |email: {{ user.email }} {</li>
+            {% endfor %}
         <input type="submit" value="List">
     </form> 
 
