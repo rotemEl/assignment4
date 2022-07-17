@@ -21,7 +21,7 @@ def index():
         db.insert("INSERT INTO users (id, username, email, password) VALUES ('" + id + "', '" + username + "', '" + email + "', '" + password + "')")
         # redirect to assignment4 page
         return redirect(url_for('assignment4.assignment4_page'))
-    if request.method == 'UPDATE':
+    if request.method == 'PUT':
         id = request.form['id']
         username = request.form['username']
         email = request.form['email']
@@ -39,7 +39,6 @@ def index():
     # if request method is get
     # then get all users from database
     # and render template
-    users = db.get_users()
-    return render_template('assignment4.html', users=users)
-
-    return render_template('assignment4.html')
+    if request.method == 'GET':
+        users = db.get_users()
+        return render_template('assignment4.html', users=users)
