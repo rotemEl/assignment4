@@ -16,7 +16,7 @@ class DB:
         )
         self.cursor = self.db.cursor()
 
-    # get user from outer source using fetch api
+    # get user from outer source using requests
     def get_outer_source(self):
         # get user from outer source
         url = 'https://reqres.in/api/users/'
