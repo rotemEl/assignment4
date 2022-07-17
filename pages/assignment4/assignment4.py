@@ -2,11 +2,12 @@
 from flask import Blueprint, render_template, request, redirect, url_for, g
 
 
-assignment4 = Blueprint('assignment4', __name__)
+assignment4 = Blueprint('assignment4', __name__, static_folder='static', static_url_path='/assignment4',
+                        template_folder='templates')
 
 
 @assignment4.route('/assignment4')
-def assignment4_page():
+def index():
     # if request method is post
     # then get id (default null), username, email and password from form
     # and insert into database
@@ -20,5 +21,25 @@ def assignment4_page():
         db.insert("INSERT INTO users (id, username, email, password) VALUES ('" + id + "', '" + username + "', '" + email + "', '" + password + "')")
         # redirect to assignment4 page
         return redirect(url_for('assignment4.assignment4_page'))
+    if request.method == 'UPDATE':
+        id = request.form['id']
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+        # update database
+        db.update("UPDATE users SET username = '" + username + "', email = '" + email + "', password = '" + password + "' WHERE id = '" + id + "'")
+        # redirect to assignment4 page
+        return redirect(url_for('assignment4.assignment4_page'))
+    if request.method == 'DELETE':
+        id = request.form['id']
+        # delete from database
+        db.delete("DELETE FROM users WHERE id = '" + id + "'")
+        # redirect to assignment4 page
+        return redirect(url_for('assignment4.assignment4_page'))
+    # if request method is get
+    # then get all users from database
+    # and render template
+    users = db.get_users()
+    return render_template('assignment4.html', users=users)
 
     return render_template('assignment4.html')

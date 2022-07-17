@@ -1,6 +1,6 @@
 # a helper mysql database class
 import mysql.connector
-
+import requests
 
 class DB:
     def __init__(self, host, user, password, database):
@@ -15,6 +15,42 @@ class DB:
             database=self.database
         )
         self.cursor = self.db.cursor()
+
+    # get user from outer source using fetch api
+    def get_outer_source(self):
+        # get user from outer source
+        url = 'https://reqres.in/api/users/'
+        # get all ids from db
+        ids = self.get_user_ids()
+        # get the last id from db
+        last_id = ids[-1][0]
+        # get the next id from outer source
+        next_id = int(last_id) + 1
+        # add next id to url
+        url = url + str(next_id)
+        response = requests.get(url)
+        # convert to json
+        data = json.loads(response.text)
+        # get user from outer source
+        return data
+
+    # get all user ids
+    def get_user_ids(self):
+        query = "SELECT id FROM users"
+        return self.query(query)
+
+    # get list of users in json format from db
+    def get_users(self):
+        query = "SELECT * FROM users"
+        return json.dumps(self.query(query))
+
+    def get_user_by_id(self, id):
+        query = "SELECT * FROM users WHERE id = '" + id + "'"
+        return self.query(query)
+
+    def get_default_user(self):
+        query = "SELECT * FROM users WHERE id = '1'"
+        return self.query(query)
 
     # a method to create intial database and table schema
     def create_schema(self):
