@@ -1,37 +1,45 @@
 # a helper mysql database class
+from flask import g
 import mysql.connector
 import requests
 
+db = DB()
+
 class DB:
-    def __init__(self, host, user, password, database):
+    def __init__(self, host='localhost', user='root', password='root1234', database='ass4'):
         self.host = host
         self.user = user
         self.password = password
         self.database = database
-        self.db = mysql.connector.connect(
-            host=self.host,
-            user=self.user,
-            password=self.password,
-            database=self.database
-        )
+        
+        if not g.db:
+            try:
+                g.db = mysql.connector.connect(
+                    host=self.host,
+                    user=self.user,
+                    password=self.password,
+                    database=self.database
+                )
+                g.db = self.db
+            except mysql.connector.Error as err:
+                print('Failed to connect to MySQL: {}'.format(err))
+                return False
+        else:
+            self.db = g.db
+
+        self.db = g.db
         self.cursor = self.db.cursor()
+        return True
 
     # get user from outer source using requests
     def get_outer_source(self):
-        # get user from outer source
         url = 'https://reqres.in/api/users/'
-        # get all ids from db
         ids = self.get_user_ids()
-        # get the last id from db
         last_id = ids[-1][0]
-        # get the next id from outer source
         next_id = int(last_id) + 1
-        # add next id to url
         url = url + str(next_id)
         response = requests.get(url)
-        # convert to json
         data = json.loads(response.text)
-        # get user from outer source
         return data
 
     # get all user ids
@@ -54,10 +62,7 @@ class DB:
 
     # a method to create intial database and table schema
     def create_schema(self):
-        # create database
         self.create_db()
-
-        # create table
         self.create_table("users", "(id VARCHAR(255), username VARCHAR(255), email VARCHAR(255), password VARCHAR(255))")
 
     # create db
