@@ -1,7 +1,8 @@
 # a helper mysql database class
 import mysql.connector, requests, json, click
 from flask import g, current_app
-from flask.wrappers import with_appcontext
+from flask.cli import with_appcontext
+from operator import attrgetter
 
 
 class DB:
@@ -16,10 +17,7 @@ class DB:
         if not g.db:
             try:
                 g.db = mysql.connector.connect(
-                    host=self.host,
-                    user=self.user,
-                    password=self.password,
-                    database=self.database,
+                    attrgetter("host", "user", "password", "database")(self)
                 )
             except mysql.connector.Error as err:
                 print("Failed to connect to MySQL: {}".format(err))
@@ -43,17 +41,17 @@ class DB:
         return g.db
 
     def init_db(self):
-        db = self.get_db()
+        self.db = self.get_db()
 
         with current_app.open_resource("schema.sql") as f:
-            db.executescript(f.read().decode("utf8"))
+            self.db.executescript(f.read().decode("utf8"))
 
-        return db
+        return self.db
 
     @click.command("init-db")
     @with_appcontext
     def init_db_command(self):
-        init_db()
+        self.init_db()
         click.echo("Initialized the database.")
 
     def close_db(self, e=None):

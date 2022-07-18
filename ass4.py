@@ -1,12 +1,10 @@
 # imports stdlib
-import click
 import json
 from datetime import timedelta
 
 
 # imports flask
 from flask import Flask
-from flask.cli import with_appcontext
 from flask_debugtoolbar import DebugToolbarExtension
 
 
