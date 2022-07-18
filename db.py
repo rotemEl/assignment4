@@ -1,9 +1,7 @@
 # a helper mysql database class
 from flask import g
-import mysql.connector
-import requests
+import mysql.connector, requests, json
 
-db = DB()
 
 class DB:
     def __init__(self, host='localhost', user='root', password='root1234', database='ass4'):
@@ -94,3 +92,6 @@ class DB:
 
     def close(self):
         self.db.close()
+
+
+db = DB()
