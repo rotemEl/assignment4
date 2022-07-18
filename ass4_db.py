@@ -1,143 +1,85 @@
 # a helper mysql database class
 import mysql.connector, requests, json, click
-from flask import g, current_app
+from flask import g, current_app, jsonify
 from flask.cli import with_appcontext
 from operator import attrgetter
 
 
-class DB:
-    def __init__(self, host=None, user=None, passwd=None, database=None):
-        self.set_db_connection_fields(host, user, passwd, database)
-        if not g.get("db", None):
-            if not self.has_all_connection_fields():
-                self.db, self.cursor = None, None
-                return
-            else:
-                try:
-                    g.db = self.connect()
-                except mysql.connector.Error as err:
-                    print("Failed to connect to MySQL: {}".format(err))
-                    return False
+def interact_db(query, query_type: str):
+    return_value = False
+    connection = mysql.connector.connect(
+        host="localhost", user="root", passwd="root1234", database="myflaskappdb"
+    )
+    cursor = connection.cursor(named_tuple=True)
+    cursor.execute(query, query_type='')
+    #
 
-        self.db = g.get("db", None)
-        self.cursor = self.db.cursor()
-        self.init_db()
-        return True
+    if query_type == "commit":
+        # Use for INSERT, UPDATE, DELETE statements.
+        # Returns: The number of rows affected by the query (a non-negative int).
+        return_value = connection.commit()
 
-    def has_all_connection_fields(self):
-        return all([self.host, self.user, self.passwd, self.db_name])
+    if query_type == "fetch":
+        # Use for SELECT statement.
+        # Returns: False if the query failed, or the result of the query if it succeeded.
+        return_value = cursor.fetchall()
 
-    def set_db_connection_fields(
-        self, host=None, user=None, passwd=None, database=None
-    ):
-        self.host, self.user, self.passwd, self.db_name = host, user, passwd, database
-
-    def connect(self):
-        if not all([self.host, self.user, self.passwd, self.db_name]):
-            return False
-
-        return mysql.connector.connect(
-            attrgetter("host", "user", "passwd", "db_name")(self)
-        )
-
-    def _create_schema(self):
-        with current_app.open_resource("schema.sql") as f:
-            self.db.executescript(f.read().decode("utf8"))
-
-    def init_db(self):
-        if g.get("db", None):
-            self._create_schema()
-            return True
-
-        if not self.db:
-            self.db = g.get("db", None)
-            if self.db:
-                self.cursor = self.db.cursor()
-            else:
-                self.cursor = None
-                return False
-
-        self._create_schema()
-        g.db = self.db
-
-        return True
-
-    def get_db(self):
-        if not self.db and not g.get("db", None):
-            if not self.has_all_connection_fields():
-                self.db, self.cursor = None, None
-                return False
-
-            self.db = self.connect()
-            g.db = self.db
-            self.cursor = self.db.cursor()
-            self.init_db()
-
-        elif self.db:
-            self.cursor = self.db.cursor()
-            g.db = self.db
-            return self.db
-
-        return False
-
-    @click.command("init-db")
-    @with_appcontext
-    def init_db_command(self):
-        self.init_db()
-        click.echo("Initialized the database.")
-
-    def close_db(self, e=None):
-        db = g.pop("db", None)
-        if db is not None:
-            db.close()
-
-    # get user from outer source using requests
-    def get_outer_source(self):
-        url, ids, last_id, next_id = (
-            "https://reqres.in/api/users/",
-            self.get_user_ids(),
-            ids[-1][0],
-            int(last_id) + 1,
-        )
-        url = url + str(next_id)
-        response = requests.get(url)
-
-        return json.loads(response.text)
-
-    def get_user_ids(self):
-        query = "SELECT id FROM users"
-        return self.query(query)
-
-    def get_users(self):
-        query = "SELECT * FROM users"
-        return json.dumps(self.query(query))
-
-    def get_user_by_id(self, id):
-        query = "SELECT * FROM users WHERE id = '" + id + "'"
-        return self.query(query)
-
-    def get_default_user(self):
-        query = "SELECT * FROM users WHERE id = '1'"
-        return self.query(query)
-
-    def query(self, query):
-        self.cursor.execute(query)
-        return self.cursor.fetchall()
-
-    def insert(self, query):
-        self.cursor.execute(query)
-        self.db.commit()
-
-    def update(self, query):
-        self.cursor.execute(query)
-        self.db.commit()
-
-    def delete(self, query):
-        self.cursor.execute(query)
-        self.db.commit()
-
-    def close(self):
-        self.db.close()
+    connection.close()
+    cursor.close()
+    return return_value
 
 
-dbh = DB()
+def _connect(cfg):
+    return mysql.connector.connect(
+        attrgetter("host", "user", "passwd", "db_name")(cfg)
+    )
+
+
+def _create_schema_with_data(conn):
+    with current_app.open_resource("schema.sql") as f:
+        conn.executescript(f.read().decode("utf8"))
+
+
+def get_user_from_outer_source():
+    url = "https://reqres.in/api/users/",
+
+    response = requests.get(url)
+
+    return response.json()
+
+
+def get_users():
+    query = "SELECT * FROM users"
+    return jsonify(interact_db(query, query_type='fetch'))
+
+
+def get_user_by_id(id):
+    query = "SELECT * FROM users WHERE id = '" + id + "'"
+    return jsonify(interact_db(query, query_type='fetch'))
+
+
+def insert_user(name, email, passwd):
+    query = "INSERT INTO users(name, email, passwd) VALUES ('%s', '%s', '%s')" % (
+        name,
+        email,
+        passwd,
+    )
+
+    return interact_db(query, query_type='commit')
+
+def update_user(id, name, email, passwd):
+    query = "UPDATE users SET name = '%s', email = '%s', passwd = '%s' WHERE id = '%s'" % (
+        name,
+        email,
+        passwd,
+        id,
+    )
+
+    return interact_db(query, query_type='commit')
+
+def delete_user(id):
+    query = "DELETE FROM users WHERE id = '%s'" % id
+
+    return interact_db(query, query_type='commit')
+
+

@@ -5,9 +5,9 @@ DEFAULT ENCRYPTION='N';
 
 CREATE TABLE IF NOT EXIST `users` (
     `id` int NOT NULL AUTO_INCREMENT,
-    `name` varchar(20) DEFAULT NULL,
+    `name` varchar(255) DEFAULT NULL,
     `email` varchar(255) DEFAULT NULL,
-    `passwd` varchar(255) DEFAULT NULL,
+    `passwd` varchar(255),
     PRIMARY KEY (`id`),
     UNIQUE KEY `email` (`email`),
     UNIQUE KEY `email_2` (`email`)
