@@ -9,7 +9,6 @@ from flask_debugtoolbar import DebugToolbarExtension
 
 
 # imports our code
-from ass4_db import db
 from pages.assignment4.assignment4 import assignment4
 
 
@@ -24,7 +23,8 @@ def create_app():
     toolbar = DebugToolbarExtension(app)
 
     with app.app_context():
-        db = db.get_db()
+        from ass4_db import dbh
+        db = dbh.get_db()
 
     app.config["SESSION_PERMANENT"] = True
     app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(minutes=20)

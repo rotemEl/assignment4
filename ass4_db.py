@@ -8,28 +8,31 @@ from operator import attrgetter
 class DB:
     def __init__(self, host=None, user=None, passwd=None, database=None):
         self.set_db_connection_fields(host, user, passwd, database)
-
-        if not g.db:
-            if not all([self.host, self.user, self.passwd, self.db_name]):
-                g.db, self.db, self.cursor = None
+        if not g.get("db", None):
+            if not self.has_all_connection_fields():
+                self.db, self.cursor = None, None
+                return
             else:
                 try:
-                    g.db = self._connect()
+                    g.db = self.connect()
                 except mysql.connector.Error as err:
                     print("Failed to connect to MySQL: {}".format(err))
                     return False
 
-        self.db = g.db
+        self.db = g.get("db", None)
         self.cursor = self.db.cursor()
         self.init_db()
         return True
+
+    def has_all_connection_fields(self):
+        return all([self.host, self.user, self.passwd, self.db_name])
 
     def set_db_connection_fields(
         self, host=None, user=None, passwd=None, database=None
     ):
         self.host, self.user, self.passwd, self.db_name = host, user, passwd, database
 
-    def _connect(self):
+    def connect(self):
         if not all([self.host, self.user, self.passwd, self.db_name]):
             return False
 
@@ -42,19 +45,40 @@ class DB:
             self.db.executescript(f.read().decode("utf8"))
 
     def init_db(self):
-        if g.db:
+        if g.get("db", None):
             self._create_schema()
             return True
 
         if not self.db:
-            self.db = self._connect()
+            self.db = g.get("db", None)
             if self.db:
                 self.cursor = self.db.cursor()
+            else:
+                self.cursor = None
+                return False
 
         self._create_schema()
         g.db = self.db
 
         return True
+
+    def get_db(self):
+        if not self.db and not g.get("db", None):
+            if not self.has_all_connection_fields():
+                self.db, self.cursor = None, None
+                return False
+
+            self.db = self.connect()
+            g.db = self.db
+            self.cursor = self.db.cursor()
+            self.init_db()
+
+        elif self.db:
+            self.cursor = self.db.cursor()
+            g.db = self.db
+            return self.db
+
+        return False
 
     @click.command("init-db")
     @with_appcontext
@@ -116,4 +140,4 @@ class DB:
         self.db.close()
 
 
-db = DB()
+dbh = DB()

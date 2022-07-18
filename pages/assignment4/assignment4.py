@@ -1,8 +1,6 @@
 # imports
 from operator import attrgetter
-
 from flask import Blueprint, g, redirect, render_template, request, url_for
-
 
 # blue print
 assignment4 = Blueprint(
@@ -17,7 +15,13 @@ assignment4 = Blueprint(
 # routes
 @assignment4.route("/assignment4")
 def index():
-    db = g.db
+    from ass4_db import dbh
+    if not dbh.get("db", None):
+        dbh.
+    if g.get("db", None):
+        db = g.db
+    else:
+        db = db.get_db()
 
     # insert user
     if request.method == "POST":
