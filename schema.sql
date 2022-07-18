@@ -3,7 +3,7 @@ DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci
 DEFAULT ENCRYPTION='N';
 
 
-CREATE TABLE `users` (
+CREATE TABLE IF NOT EXIST `users` (
     `id` int NOT NULL AUTO_INCREMENT,
     `name` varchar(20) DEFAULT NULL,
     `email` varchar(255) DEFAULT NULL,

@@ -1,8 +1,10 @@
-# a flask blueprint for the assignment4 page
-from flask import Blueprint, render_template, request, redirect, url_for, g
+# imports
 from operator import attrgetter
 
+from flask import Blueprint, g, redirect, render_template, request, url_for
 
+
+# blue print
 assignment4 = Blueprint(
     "assignment4",
     __name__,
@@ -12,6 +14,7 @@ assignment4 = Blueprint(
 )
 
 
+# routes
 @assignment4.route("/assignment4")
 def index():
     db = g.db

@@ -6,47 +6,55 @@ from operator import attrgetter
 
 
 class DB:
-    def __init__(self, host=None, user=None, password=None, database=None):
-        if not all([host, user, password, database]):
-            self.db = None
-            self.cursor = None
-            return True
-
-        self.set_object_fields(host, user, password, database)
+    def __init__(self, host=None, user=None, passwd=None, database=None):
+        self.set_db_connection_fields(host, user, passwd, database)
 
         if not g.db:
-            try:
-                g.db = mysql.connector.connect(
-                    attrgetter("host", "user", "password", "database")(self)
-                )
-            except mysql.connector.Error as err:
-                print("Failed to connect to MySQL: {}".format(err))
-                return False
+            if not all([self.host, self.user, self.passwd, self.db_name]):
+                g.db, self.db, self.cursor = None
+            else:
+                try:
+                    g.db = self._connect()
+                except mysql.connector.Error as err:
+                    print("Failed to connect to MySQL: {}".format(err))
+                    return False
 
         self.db = g.db
         self.cursor = self.db.cursor()
+        self.init_db()
         return True
 
-    def set_object_fields(self, host, user, password, database):
-        self.host = host
-        self.user = user
-        self.password = password
-        self.database = database
+    def set_db_connection_fields(
+        self, host=None, user=None, passwd=None, database=None
+    ):
+        self.host, self.user, self.passwd, self.db_name = host, user, passwd, database
 
-    # db initialization, creation and termination of the database
-    def get_db(self):
-        if "db" not in g:
-            g.db = DB("localhost", "root", "root1234", "assignment4")
-            g.db.create_schema()
-        return g.db
+    def _connect(self):
+        if not all([self.host, self.user, self.passwd, self.db_name]):
+            return False
 
-    def init_db(self):
-        self.db = self.get_db()
+        return mysql.connector.connect(
+            attrgetter("host", "user", "passwd", "db_name")(self)
+        )
 
+    def _create_schema(self):
         with current_app.open_resource("schema.sql") as f:
             self.db.executescript(f.read().decode("utf8"))
 
-        return self.db
+    def init_db(self):
+        if g.db:
+            self._create_schema()
+            return True
+
+        if not self.db:
+            self.db = self._connect()
+            if self.db:
+                self.cursor = self.db.cursor()
+
+        self._create_schema()
+        g.db = self.db
+
+        return True
 
     @click.command("init-db")
     @with_appcontext
@@ -61,21 +69,21 @@ class DB:
 
     # get user from outer source using requests
     def get_outer_source(self):
-        url = "https://reqres.in/api/users/"
-        ids = self.get_user_ids()
-        last_id = ids[-1][0]
-        next_id = int(last_id) + 1
+        url, ids, last_id, next_id = (
+            "https://reqres.in/api/users/",
+            self.get_user_ids(),
+            ids[-1][0],
+            int(last_id) + 1,
+        )
         url = url + str(next_id)
         response = requests.get(url)
-        data = json.loads(response.text)
-        return data
 
-    # get all user ids
+        return json.loads(response.text)
+
     def get_user_ids(self):
         query = "SELECT id FROM users"
         return self.query(query)
 
-    # get list of users in json format from db
     def get_users(self):
         query = "SELECT * FROM users"
         return json.dumps(self.query(query))
@@ -87,24 +95,6 @@ class DB:
     def get_default_user(self):
         query = "SELECT * FROM users WHERE id = '1'"
         return self.query(query)
-
-    # a method to create intial database and table schema
-    def create_schema(self):
-        self.create_db()
-        self.create_table(
-            "users",
-            "(id VARCHAR(255), username VARCHAR(255), email VARCHAR(255), password VARCHAR(255))",
-        )
-
-    # create db
-    def create_db(self):
-        self.cursor.execute("CREATE DATABASE IF NOT EXISTS " + self.database)
-        self.db.commit()
-
-    # create table
-    def create_table(self, table, columns):
-        self.cursor.execute("CREATE TABLE IF NOT EXISTS " + table + "(" + columns + ")")
-        self.db.commit()
 
     def query(self, query):
         self.cursor.execute(query)
