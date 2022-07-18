@@ -5,7 +5,7 @@ DEFAULT ENCRYPTION='N';
 
 CREATE TABLE `users` (
     `id` int NOT NULL AUTO_INCREMENT,
-    `username` varchar(20) DEFAULT NULL,
+    `name` varchar(20) DEFAULT NULL,
     `email` varchar(255) DEFAULT NULL,
     `passwd` varchar(255) DEFAULT NULL,
     PRIMARY KEY (`id`),

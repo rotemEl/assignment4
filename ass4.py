@@ -10,7 +10,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 
 
 # imports our code
-from db import DB
+from ass4_db import DB
 from pages.assignment4.assignment4 import assignment4
 
 
@@ -39,7 +39,6 @@ def init_db():
 @click.command('init-db')
 @with_appcontext
 def init_db_command():
-    """Clear the existing data and create new tables."""
     init_db()
     click.echo('Initialized the database.')
 
@@ -71,7 +70,6 @@ def create_app():
             return db.get_default_user()
         if id is not int: return json.dumps({'error': 'id must be an integer'})
         return db.get_user_by_id(id)
-    
     
     return app
 

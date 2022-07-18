@@ -1,50 +1,41 @@
-<!-- This template will contain four
-parts:
-a. Insertion form
-b. Update form
-c. Deletion form
-d. List of users  -->
 <html>
+
 <head>
     <title>Assignment 4</title>
     <link rel="stylesheet" type="text/css" href="../../css/style.css">
 </head>
 
-
 <body>
-
-    <!-- 4 forms for CRUD operations -->
-    
     <form action="/assignment4" method="post" name="">
-        <input type="text" placeholder="username">
+        <input type="text" placeholder="name">
         <input type="text" placeholder="password">
         <input type="text" placeholder="email">
         <input type="submit" value="Insert">
     </form>
 
     <form action="/assignment4" method="put" name="update">
-        <input type="text" placeholder="username">
+        <input type="text" placeholder="name">
         <input type="text" placeholder="password">
         <input type="text" placeholder="email">
         <input type="submit" value="Update">
     </form>
 
     <form action="/assignment4" method="delete" name="delete">
-        <input type="text" placeholder="username">
+        <input type="number" name="id" placeholder="user id">
+        <input type="text" name="email" placeholder="user email">
         <input type="submit" value="Delete">
     </form>
 
     <form action="/assignment4" method="list" name="list">
-        <!-- use jinja2 to display a list of all users -->
         <ul>
             {% for user in users %}
-                <li>username: {{ user.username }}  |email: {{ user.email }} {</li>
+            <li>
+                <div>id: {{ user.id }}</div>
+                <div>name: {{ user.name }} | email: {{ user.email }}</div>
+            </li>
             {% endfor %}
-        <input type="submit" value="List">
-    </form> 
-
-
-
+            <input type="submit" value="List">
+    </form>
 </body>
 
 </html>
