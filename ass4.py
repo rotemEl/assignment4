@@ -11,7 +11,7 @@ from flask_debugtoolbar import DebugToolbarExtension
 # imports our code
 from pages.assignment4.assignment4 import assignment4
 
-
+# app factory
 def create_app():
     app = Flask(__name__)
     app.secret_key = "123"

@@ -17,7 +17,7 @@ assignment4 = Blueprint(
 def index():
     from ass4_db import dbh
     if not dbh.get("db", None):
-        dbh.
+        dbh.init_db()
     if g.get("db", None):
         db = g.db
     else:
