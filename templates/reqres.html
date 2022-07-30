@@ -1,0 +1,38 @@
+
+{% extends "base.html" %}
+{% block title %}Assignment 4s{% endblock %}
+{% block head %}
+{{ super() }}
+{% endblock %}
+{% block content %}
+<div class="gridContainer">
+    <div class="header">
+        <h1 id="title">User details</h1>
+    </div>
+
+      <li><h2>Frontend</h2></li>
+        <form action="/assignment_4/outer_source"  method="POST">
+                <label>id:</label>
+                <input type="text" id="user_id" required><br>
+                <button id="submit" onclick="get_outer_user()" type="button">Submit</button>
+            </form><br>
+
+    <li><h2>backend</h2></li>
+    <form action="/outer_source" method="post" name="insert">
+        <input type="text" name="id">
+        <input type="submit" value="Insert">
+    </form>
+<p id="output"></p>
+{% if reqres_user %}
+    <ol>
+        {% for k,v in reqres_user.items() %}
+            <li><h2>{{ k }}: {{ v }}</h2></li>
+        {% endfor %}
+    </ol>
+
+{% endif %}
+
+
+</div>
+</div>
+{% endblock %}

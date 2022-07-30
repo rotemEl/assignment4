@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Part 2{% endblock %}
+{% block head %}
+{{ super() }}
+{% endblock %}
+
+
+{% block content %}
+  {% if username == None %}
+    <form action="/assignment3_2", method="Post">
+        <p>Login</p>
+        <input type="text" name="username" placeholder="username">
+        <input type="password" name="password" placeholder="password">
+        <input type="submit">
+    </form>
+  {% endif %}
+    <form action="/search" method="post">
+        <input type="text" id="search" name="search">
+        <input type="submit", value="Search">
+    </form>
+    {% if search_results != [] %}
+        <!-- this unordered list of users will appear under the search button -->
+        <ul>
+          {% for key, value in search_results.items() %}
+            <li>{{ key }}, {{ value }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+    <form action="/log_out" method="Get">
+        <input type="submit" action="log_out" value="Logout">
+    </form>
+{% endblock %}

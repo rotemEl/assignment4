@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block head %}
+{{ super() }}
+{% endblock %}
+{% block content %}
+    <div class="gridContainer">
+    <div class="header">
+      <h1 id="title">Welcome to my home page </h1>
+     
+     </div>
+
+        <div class="item1" >
+          <img src="../static/images/flower_image.jpg" alt="Flower picture" class="Flower_picture">
+          
+        </div>         
+
+      </div>
+            <div class="item2">
+              <p>
+                Last updated
+                <time datetime="2022-05-21">
+                  MAY 21rd 2022
+                </time>
+              </p>
+              <nav>
+                <a href="https://www.instagram.com/accounts/login/"><img src="../static/images/insta_icon.jpg" alt="insta_icon" class="animation"></a>
+            </nav>
+            </div>
+    </div>
+ {% endblock %}

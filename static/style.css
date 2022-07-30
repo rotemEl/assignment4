@@ -1,0 +1,151 @@
+:root {
+    --Beige: rgb(255, 238, 215);
+    --flower: #f24f64;
+    --dark_flower: hwb(347 13% 31%);
+}
+
+.dark_flower {
+    color: var(--dark_flower);
+}
+
+.flower {
+    color: var(--flower);
+}
+
+.Flower_picture {
+    width: 10cm;
+    height: inherit 10cm;
+    padding: 10px;
+    border: 2px solid palevioletred;
+    margin: 10px;
+    display: block;
+
+
+}
+
+@font-face {
+    font-family: titleFont;
+    src: url(Oleo_Script_Swash_Caps/OleoScriptSwashCaps-Regular.ttf);
+
+}
+
+@font-face {
+    font-family: bodyFont;
+    src: url(Antic_Slab/AnticSlab-Regular.ttf);
+
+}
+
+
+* {
+    box-sizing: border-box;
+    color: var(--flower);
+    background-color: var(--Beige);
+    font-family: bodyFont;
+    padding: 5px;
+    margin: 5px;
+}
+
+
+#title {
+    font-family: titleFont;
+    text-align: center;
+}
+
+.active {
+    background-color: rgba(255, 255, 255, 0.471);
+
+}
+
+*:active:visited {
+    color: var(--dark_flower)
+}
+
+/*when click on link color changed*/
+nav li a:hover {
+    color: var(--dark_flower);
+    /*when yoy flown above*/
+}
+
+
+@media only screen and (max-width: 1000px) {
+    .gridContainer {
+        display: grid;
+        grid-template-areas:
+            'header'
+            'item1'
+            'item2';
+
+        background-color: blanchedalmond;
+        padding: 20px;
+        margin: 20px;
+    }
+}
+
+
+.animation {
+    /*integram */
+    width: 40px;
+    height: 40px;
+    animation: jump .5s linear alternate 10;
+    vertical-align: middle;
+    margin-inline: 10px;
+
+}
+
+@keyframes jump {
+    0% {
+        transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+    }
+
+    40% {
+        transform: translate3d(0, 30%, 0) scale3d(.7, 1.5, 1);
+    }
+
+    100% {
+        transform: translate3d(0, 100%, 0) scale3d(1.5, .7, 1);
+    }
+}
+
+.menu-items:hover {
+    cursor: pointer;
+}
+
+.menu-items {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: 1fr;
+    grid-auto-flow: column;
+    text-decoration: none;
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+    color: var(--flower);
+}
+
+.greeting-hidden {
+    z-index: -1;
+}
+
+.greeting {
+    justify-self: center;
+    padding: 15px;
+}
+
+.greeting-placeholder {
+    width: 3vw;
+    background-color: var(--dark_flower);
+}
+
+.navbar {
+    margin:auto;
+    width: 100%;
+    grid-gap: 5px;
+    display: inline-grid;
+    grid-template-columns: 4vw 19vw 58vw;
+    grid-template-rows: 1fr;
+    grid-auto-flow: column;
+    text-decoration: none;
+    background-color: var(--dark_flower);
+}

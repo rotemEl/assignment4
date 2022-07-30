@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Part 1{% endblock %}
+{% block head %}
+{{ super() }}
+{% endblock %}
+{% block content %}
+<br>
+First Name upper: {{firstName | default('Unknown', true) | upper()}}
+<br>
+Last Name lower : {{lastName | default('Unknown', true) | lower()}}
+<br>
+{% if firstName %}
+Your name is {{ firstName }} {{ lastName }}
+{% else %}
+first name missing
+{% endif %}
+<br>
+Hobbies:
+<ol>
+    {% for hobby in hobbies %}
+    <li>{{hobby}}</li>
+    {% endfor %}
+</ol>
+{% endblock %}
